@@ -72,7 +72,6 @@ function updateWorkspaceState() {
 }
 
 // 创建新工作区窗口
-// 创建新工作区窗口
 function createWorkspaceWindow(workspaceId, urls = []) {
   console.log('创建工作区窗口:', workspaceId, '，URL数量:', urls.length);
   
@@ -133,7 +132,6 @@ function createWorkspaceWindow(workspaceId, urls = []) {
 }
 
 // 应用工作区颜色到窗口
-// 应用工作区颜色到窗口
 function applyWorkspaceColorToWindow(windowId, color) {
   console.log('应用颜色到窗口:', windowId, '颜色:', color);
   
@@ -147,7 +145,7 @@ function applyWorkspaceColorToWindow(windowId, color) {
       return;
     }
     
-    console.log('为', tabs.length, '个标签页应用颜色');
+    console.log('为', tabs.length, '个标签页应用颜色:', colorToApply);
     
     tabs.forEach(tab => {
       // 跳过Chrome内置页面，因为无法注入脚本

@@ -42,40 +42,39 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   
   // 初始化颜色选择器
- // 初始化颜色选择器
-function initColorOptions() {
-  console.log('初始化颜色选择器');
-  
-  // 默认选中第一个颜色
-  colorOptions[0].classList.add('selected');
-  selectedColor = colorOptions[0].dataset.color;
-  
-  // 添加颜色选择事件
-  colorOptions.forEach(option => {
-    option.addEventListener('click', () => {
-      // 移除之前的选中状态
-      colorOptions.forEach(opt => opt.classList.remove('selected'));
-      // 添加新的选中状态
-      option.classList.add('selected');
-      // 保存选中的颜色
-      selectedColor = option.dataset.color;
-      console.log('选择了颜色:', selectedColor);
+  function initColorOptions() {
+    console.log('初始化颜色选择器');
+    
+    // 默认选中第一个颜色
+    colorOptions[0].classList.add('selected');
+    selectedColor = colorOptions[0].dataset.color;
+    
+    // 添加颜色选择事件
+    colorOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        // 移除之前的选中状态
+        colorOptions.forEach(opt => opt.classList.remove('selected'));
+        // 添加新的选中状态
+        option.classList.add('selected');
+        // 保存选中的颜色
+        selectedColor = option.dataset.color;
+        console.log('选择了颜色:', selectedColor);
+      });
     });
-  });
-  
-  // 编辑模态框中的颜色选择
-  editColorOptions.forEach(option => {
-    option.addEventListener('click', () => {
-      // 移除之前的选中状态
-      editColorOptions.forEach(opt => opt.classList.remove('selected'));
-      // 添加新的选中状态
-      option.classList.add('selected');
-      // 保存选中的颜色
-      selectedEditColor = option.dataset.color;
-      console.log('编辑模式选择了颜色:', selectedEditColor);
+    
+    // 编辑模态框中的颜色选择
+    editColorOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        // 移除之前的选中状态
+        editColorOptions.forEach(opt => opt.classList.remove('selected'));
+        // 添加新的选中状态
+        option.classList.add('selected');
+        // 保存选中的颜色
+        selectedEditColor = option.dataset.color;
+        console.log('编辑模式选择了颜色:', selectedEditColor);
+      });
     });
-  });
-}
+  }
   
   // 保存编辑按钮点击事件
   saveEditBtn.addEventListener('click', () => {
