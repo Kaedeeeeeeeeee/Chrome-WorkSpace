@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const noWorkspacesMessage = document.getElementById('no-workspaces');
   const workspaceNameInput = document.getElementById('workspace-name');
   const createWorkspaceBtn = document.getElementById('create-workspace-btn');
-  const activeWorkspaceName = document.getElementById('active-workspace-name');
   const colorOptions = document.querySelectorAll('.color-options .color-option');
   const editColorOptions = document.querySelectorAll('.edit-color-options .color-option');
   
@@ -22,9 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // 初始化颜色选择器
   initColorOptions();
   
-  // 加载工作区列表和当前工作区信息
+  // 加载工作区列表
   loadWorkspaces();
-  loadCurrentWorkspace();
 
   // 创建工作区按钮点击事件
   createWorkspaceBtn.addEventListener('click', () => {
@@ -44,37 +42,40 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   
   // 初始化颜色选择器
-  function initColorOptions() {
-    console.log('初始化颜色选择器');
-    // 默认选中第一个颜色
-    colorOptions[0].classList.add('selected');
-    
-    // 添加颜色选择事件
-    colorOptions.forEach(option => {
-      option.addEventListener('click', () => {
-        // 移除之前的选中状态
-        colorOptions.forEach(opt => opt.classList.remove('selected'));
-        // 添加新的选中状态
-        option.classList.add('selected');
-        // 保存选中的颜色
-        selectedColor = option.dataset.color;
-        console.log('选择了颜色:', selectedColor);
-      });
+ // 初始化颜色选择器
+function initColorOptions() {
+  console.log('初始化颜色选择器');
+  
+  // 默认选中第一个颜色
+  colorOptions[0].classList.add('selected');
+  selectedColor = colorOptions[0].dataset.color;
+  
+  // 添加颜色选择事件
+  colorOptions.forEach(option => {
+    option.addEventListener('click', () => {
+      // 移除之前的选中状态
+      colorOptions.forEach(opt => opt.classList.remove('selected'));
+      // 添加新的选中状态
+      option.classList.add('selected');
+      // 保存选中的颜色
+      selectedColor = option.dataset.color;
+      console.log('选择了颜色:', selectedColor);
     });
-    
-    // 编辑模态框中的颜色选择
-    editColorOptions.forEach(option => {
-      option.addEventListener('click', () => {
-        // 移除之前的选中状态
-        editColorOptions.forEach(opt => opt.classList.remove('selected'));
-        // 添加新的选中状态
-        option.classList.add('selected');
-        // 保存选中的颜色
-        selectedEditColor = option.dataset.color;
-        console.log('编辑模式选择了颜色:', selectedEditColor);
-      });
+  });
+  
+  // 编辑模态框中的颜色选择
+  editColorOptions.forEach(option => {
+    option.addEventListener('click', () => {
+      // 移除之前的选中状态
+      editColorOptions.forEach(opt => opt.classList.remove('selected'));
+      // 添加新的选中状态
+      option.classList.add('selected');
+      // 保存选中的颜色
+      selectedEditColor = option.dataset.color;
+      console.log('编辑模式选择了颜色:', selectedEditColor);
     });
-  }
+  });
+}
   
   // 保存编辑按钮点击事件
   saveEditBtn.addEventListener('click', () => {
@@ -82,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const name = editNameInput.value.trim();
       
       if (name) {
-        console.log('保存工作区编辑:', currentEditingWorkspace, name, selectedEditColor);
+        console.log('保存工作区编辑:', currentEditingWorkspace, name, '选中颜色:', selectedEditColor);
         updateWorkspace(currentEditingWorkspace, name, selectedEditColor);
         closeEditModal();
       }
@@ -108,25 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderWorkspaces(workspaces, activeWorkspace);
       }
     });
-  }
-  
-  // 加载当前活动工作区信息
-  function loadCurrentWorkspace() {
-    console.log('加载当前工作区信息');
-    chrome.runtime.sendMessage(
-      { action: 'getCurrentWorkspace' },
-      (response) => {
-        if (response && response.workspace) {
-          console.log('当前工作区:', response.workspace.name);
-          activeWorkspaceName.textContent = response.workspace.name;
-          activeWorkspaceName.style.color = response.workspace.color || '#0078d4';
-        } else {
-          console.log('没有当前工作区');
-          activeWorkspaceName.textContent = '未选择工作区';
-          activeWorkspaceName.style.color = '#666';
-        }
-      }
-    );
   }
 
   // 渲染工作区列表
@@ -158,10 +140,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (workspace.id === activeWorkspace) {
       workspaceEl.classList.add('active');
     }
-
+  
     // 工作区图标（使用工作区名称首字母）
     const firstLetter = workspace.name.charAt(0).toUpperCase();
     const iconColor = workspace.color || '#0078d4';
+    console.log('渲染工作区:', workspace.name, '颜色:', iconColor);
     
     workspaceEl.innerHTML = `
       <div class="workspace-icon" style="background-color: ${iconColor};">${firstLetter}</div>
@@ -175,28 +158,25 @@ document.addEventListener('DOMContentLoaded', () => {
         <button class="delete-btn" title="删除工作区">删除</button>
       </div>
     `;
-
-    // 点击工作区打开
+  
+    // 添加事件监听器...
     workspaceEl.querySelector('.open-btn').addEventListener('click', (e) => {
       e.stopPropagation();
       console.log('点击打开工作区:', workspace.id);
       openWorkspace(workspace.id);
     });
-
-    // 点击整个区域也能打开
+  
     workspaceEl.addEventListener('click', () => {
       console.log('点击工作区区域, 打开工作区:', workspace.id);
       openWorkspace(workspace.id);
     });
     
-    // 编辑工作区
     workspaceEl.querySelector('.edit-btn').addEventListener('click', (e) => {
       e.stopPropagation();
       console.log('点击编辑工作区:', workspace.id, workspace.name);
       openEditModal(workspace);
     });
-
-    // 删除工作区
+  
     workspaceEl.querySelector('.delete-btn').addEventListener('click', (e) => {
       e.stopPropagation();
       if (confirm(`确定要删除工作区 "${workspace.name}" 吗?`)) {
@@ -204,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
         deleteWorkspace(workspace.id);
       }
     });
-
+  
     return workspaceEl;
   }
 
@@ -216,8 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
       (response) => {
         if (response && response.success) {
           console.log('工作区创建成功');
-          loadWorkspaces();
-          loadCurrentWorkspace();
           window.close(); // 关闭弹出窗口
         } else {
           console.error('工作区创建失败');
@@ -234,7 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
       (response) => {
         if (response && response.success) {
           console.log('工作区打开成功');
-          loadCurrentWorkspace();
           window.close(); // 关闭弹出窗口
         } else {
           console.error('工作区打开失败:', response ? response.message : '未知错误');
@@ -252,7 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (response && response.success) {
           console.log('工作区删除成功');
           loadWorkspaces();
-          loadCurrentWorkspace();
         } else {
           console.error('工作区删除失败');
         }
@@ -269,7 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (response && response.success) {
           console.log('工作区更新成功');
           loadWorkspaces();
-          loadCurrentWorkspace();
         } else {
           console.error('工作区更新失败');
         }
@@ -279,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // 打开编辑模态框
   function openEditModal(workspace) {
-    console.log('打开编辑模态框:', workspace.id, workspace.name, workspace.color);
+    console.log('打开编辑模态框:', workspace.id, workspace.name, '工作区颜色:', workspace.color);
     currentEditingWorkspace = workspace.id;
     editNameInput.value = workspace.name;
     selectedEditColor = workspace.color || '#0078d4';
@@ -289,6 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
       option.classList.remove('selected');
       if (option.dataset.color === selectedEditColor) {
         option.classList.add('selected');
+        console.log('选中颜色选项:', option.dataset.color);
       }
     });
     
@@ -301,4 +277,4 @@ document.addEventListener('DOMContentLoaded', () => {
     currentEditingWorkspace = null;
     editModal.classList.remove('show');
   }
-}); 
+});
